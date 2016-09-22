@@ -1,6 +1,6 @@
 # mpegHD
 #! /usr/bin/bash
-#title           :mpegHD
+#title           :mpegHD NCCA utility
 #description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames.
 #author		     :Ioannis Ioannidis
 #date            :4/12/2015
