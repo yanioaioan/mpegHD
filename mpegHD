@@ -1,0 +1,252 @@
+#! /usr/bin/bash
+#title           :mpegHD
+#description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames.
+#author		     :Ioannis Ioannidis
+#date            :4/12/2015
+#version         :2  
+#usage		     :./mpegHD pathToSequenceOfTiffs out.mp4,  example format myframe_0001.tiff
+#date modified   :21/09/2016  
+#==============================================================================
+
+
+pathToSequence=$1
+outputVideoFile=$2
+
+
+#The following handles the fact the we may have all frame sequence directory formats, for example: #. OR ./ OR pathToSequenceDir/
+#check if the dir of the frame sequence given is simply .
+#if yes, then append the / to it so it finally becomes ./
+if [ "$pathToSequence" == "." ];then
+	echo "$pathToSequence"=="."
+	pathToSequence="./"
+	echo "pathToSequence=" $pathToSequence
+elif [ "${#pathToSequence}" -gt 1 ];then	
+	str=$pathToSequence
+	
+	echo "last character of path directory to sequence is:" ${str: -1}
+	
+	if [ "${str: -1}" != "/" ];then
+		echo "need to add / to separate the Directory from the Frame name: "
+		echo "/ appended to $pathToSequence"
+		pathToSequence=$pathToSequence"/"		
+		echo "now frame sequence path has become:  $pathToSequence"
+		echo "and sample file now has become:  $pathToSequence$baseTifname"
+	fi
+fi
+
+
+#remove previously exported mp4 file otherewise it fails as the script demands that only the tiffs are there in the directory
+if [ -f "$pathToSequence$outputVideoFile" ]; then
+    echo "File found!"
+    eval rm -rf \"$pathToSequence$outputVideoFile\"
+    echo "..deleting '$pathToSequence$outputVideoFile' video"
+fi
+
+
+echo $pathToSequence
+echo $outputVideoFile
+
+baseTifname=""
+for file in `ls "$pathToSequence"`; do
+        baseTifname=$file
+done
+
+echo "sample file: "$pathToSequence$baseTifname
+
+
+echo "$pathToSequence$baseTifname"
+
+#Grab and check frame format
+HBINFO=$(echo tiffinfo \"$pathToSequence$baseTifname\" )
+eval $HBINFO > tmpfile
+HBINFO=$(eval cat tmpfile | grep "Image Width")
+
+
+HBWIDTH=$(echo $HBINFO | awk '{print $3}')
+HBHEIGHT=$(echo $HBINFO | awk '{print $6}')
+HBBITS=$(eval tiffinfo \"$pathToSequence$baseTifname\" )
+eval $HBBITS > tmpfile
+HBBITS=$(eval cat tmpfile | grep "Bits/Sample") | awk '{print $2}'
+
+eval rm -rf tmpfile
+
+echo "HBINFO="$HBINFO
+echo "HBWIDTH="$HBWIDTH
+echo "HBHEIGHT="$HBHEIGHT
+echo "HBBITS="$HBBITS
+
+#if  [[ ( $a -ne 0 &&  $a -ne 1  )  ||  ( $b -ne 2  &&  $b -ne 3 )  || ( $c -ne 4 ) ]]   ; then
+
+if [[ ( $HBWIDTH -ne 1280  &&  $HBWIDTH -ne 1920 ) || ( $HBHEIGHT -ne 720  &&  $HBHEIGHT -ne 1080 ) || ( $HBBITS -ne 8 ) ]] ; then
+        echo $'\nMake sure your using the following command format: \n\n	Basic script usage: ./mpegScript.sh pathToSequenceOfTiffs out.mp4\nOR\n'
+        echo "wrong image format: needs to be either 1920x1080 8 bit or 1280x720 8bit"
+        echo "you need to make sure you have exporter the frame sequence based on the previous specs"
+        exit
+fi
+
+
+
+IFS=',._-/' read -a myarray <<< "$baseTifname"
+
+echo "$baseTifname"
+
+
+#assing and count characters
+padding="${myarray[-2]}"
+paddingnumberofCharcters=${#padding}
+
+
+echo "padding.. "$padding
+echo "paddingnumberofCharcters.. "$paddingnumberofCharcters
+
+
+
+#if none of the most common delimeters have been used..we assume the padding goes directly after the base frame name as in: myframe0001.tiff
+#in which case..we handle it differenty by splitting the base filename in the 'while loop' and by assigning it to a basename or pad var.
+#Then we use these
+
+echo "array length is: "${#myarray[@]}
+
+echo "extension is: "${myarray[-1]}
+echo "padding is "${myarray[-2]}
+
+
+
+
+if echo ${myarray[-2]} | grep "[a-zA-Z]";then
+        echo "found character in padding..which means there's no usual delimeter separating them"
+
+
+        echo "no delimeter"
+
+        echo $baseTifname
+
+
+
+
+        tiffExtension="${myarray[-1]}"
+        echo "extension:" $tiffExtension
+
+
+        totalnumberofCharsOfframeName=${#baseTifname}
+        totalnumberofCharsOfExtension=${#tiffExtension}
+        totalnumberofCharsOfframeNameWithoutExtension=`expr $totalnumberofCharsOfframeName - $totalnumberofCharsOfExtension`
+
+        echo "totalnumberofCharsOfframeName: "$totalnumberofCharsOfframeName
+        echo "totalnumberofCharsOfExtension: "$totalnumberofCharsOfExtension
+        echo "totalnumberofCharsOfframeNameWithoutExtension: "$totalnumberofCharsOfframeNameWithoutExtension
+
+
+        padding="${myarray[-2]}"
+        echo "padding extension:" $padding
+
+        #baseLeft=`expr $totalnumberofCharsOfframeNameWithoutExtension - ${#padding}`
+        #echo "baseLeft: "$baseLeft
+
+
+        #echo "basename:" $baseTifname
+        #baseTifname=${baseTifname:0:$baseLeft-1}
+        #echo "basename:" $baseTifname
+
+        echo "-------------------------------------------------------------------------"
+
+
+
+
+        #GET BASE FRAME NAME
+        unset -v basename
+        basename=$(
+                echo $baseTifname | {
+                        while read baseTifname;	do
+                                res_alpha=`expr "$baseTifname" : '\(.*[^0-9]\+\)[0-9]*'`
+                                res_num=`expr "$baseTifname" : "${res_alpha}\(.*\)"`
+                                #echo "$baseTifname = '$res_alpha' + '$res_num'"
+                                baseTifname=$res_alpha
+                                padding=$res_num
+                                #echo "splitted = '$baseTifname' + '$padding'"
+                                basename=$baseTifname
+
+
+                        done
+                        echo $basename
+                }
+
+        )
+
+
+        #GET BASE PADDING NUMBER OF DIGITS
+        unset -v pad
+        pad=$(
+                echo $padding | {
+                        while read padding;	do
+                                res_alpha=`expr "$padding" : '\(.*[^0-9]\+\)[0-9]*'`
+                                res_num=`expr "$padding" : "${res_alpha}\(.*\)"`
+                                #echo "$var = '$res_alpha' + '$res_num'"
+                                padding=$res_alpha
+                                padding=$res_num
+                                #echo "splitted = '$padding' + '$padding'"
+                                pad=$padding
+
+
+                        done
+                        echo $pad
+                }
+
+        )
+
+        echo $basename
+        echo "PAD: "$pad
+        baseTifname=$basename
+        paddingnumberofCharcters=${#pad}
+
+
+
+        echo "$basename"
+        echo "$tiffExtension"
+        echo "$pad"
+        baseLeft=`expr ${#basename} - ${#tiffExtension} - ${#pad}`
+        baseTifname=${basename:0:$baseLeft-1}
+        echo "now baseTifname..:" $baseTifname
+
+        eval "/usr/bin/ffmpeg -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'make sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit or 1280*720 8bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+
+else
+
+
+        echo "padding number:" $padding
+
+
+        tiffExtension="${myarray[-1]}"
+        echo "extension:" $tiffExtension
+
+
+        totalnumberofCharsOfframeName=${#baseTifname}
+        totalnumberofCharsOfExtension=${#tiffExtension}
+        totalnumberofCharsOfframeNameWithoutExtension=`expr $totalnumberofCharsOfframeName - $totalnumberofCharsOfExtension`
+
+        echo "totalnumberofCharsOfframeName: "$totalnumberofCharsOfframeName
+        echo "totalnumberofCharsOfExtension: "$totalnumberofCharsOfExtension
+        echo "totalnumberofCharsOfframeNameWithoutExtension: "$totalnumberofCharsOfframeNameWithoutExtension
+
+
+        padding="${myarray[-2]}"
+        echo "padding extension:" $padding
+
+        baseLeft=`expr $totalnumberofCharsOfframeNameWithoutExtension - ${#padding}`
+        echo "baseLeft: "$baseLeft
+
+
+        echo "basename:" $baseTifname
+        baseTifname=${baseTifname:0:$baseLeft-1}
+        echo "basename:" $baseTifname
+
+
+        paddingnumberofCharcters=${#padding}
+
+        eval "/usr/bin/ffmpeg -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'make sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit or 1280*720 8bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+
+fi
+
+
+
+
