@@ -1,0 +1,35 @@
+#! /usr/bin/bash
+#title           :renameFilesByPattern
+#description     :This script is to Rename files in a directory based on a pattern specified iteratively
+#author		     :Ioannis Ioannidis
+#date            :20/09/2016
+#version         :1    
+#usage			 : ./renameFilesByPattern filenamePart matchexpression replaceexpression" ex. to find files containing 'myframe' and change the myfr part to my_fr
+#------------------------------------------------------------------------------------we would type: ./renameFilesByPattern myframe myfr my_fr
+#date modified   :21/09/2016
+#==============================================================================
+
+#for f in *myframe*; do mv $f ${f/myframe/myframe_}; done
+#basic usage: ./renameScript filestomatch matchexpression replaceexpression"
+
+
+if [ $# -ne 3 ]; then
+	echo $2
+	echo "Basic usage syntax: ./renameScript commonFilenamePattern matchExpression replaceExpression"
+	echo "Syntax usage explanation: to match all files in a directory containing the word 'frame', and replace the word 'fr' with '.fr' we would type: renameFilesByPattern frame fr .fr"
+	
+	echo "Please rerun using proper syntax!"
+	exit
+fi
+
+PATTERNFILE=$1
+PATTERNMATCHEXPR=$2
+PATTERNREPLACEEXPR=$3
+
+#echo $PATTERNFILE
+#echo $PATTERNMATCHEXPR
+#echo $PATTERNREPLACEEXPR
+
+for f in *$PATTERNFILE*; do mv $f ${f/$PATTERNMATCHEXPR/$PATTERNREPLACEEXPR}; done
+
+
