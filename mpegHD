@@ -47,9 +47,24 @@ echo $pathToSequence
 echo $outputVideoFile
 
 baseTifname=""
-for file in `ls "$pathToSequence"`; do
-        baseTifname=$file
+
+
+cwr=$(eval echo $PWD)
+echo "cwr:" $cwr
+
+
+eval cd \"$pathToSequence\"
+eval echo $PWD
+
+
+for file in `ls *tif*`; do
+        baseTifname="$file"
+        echo "baseTifname: "$baseTifname
 done
+
+
+eval cd \"$cwr\"
+
 
 echo "sample file: "$pathToSequence$baseTifname
 
@@ -64,7 +79,7 @@ HBINFO=$(eval cat tmpfile | grep "Image Width")
 
 HBWIDTH=$(echo $HBINFO | awk '{print $3}')
 HBHEIGHT=$(echo $HBINFO | awk '{print $6}')
-HBBITS=$(eval tiffinfo \"$pathToSequence$baseTifname\" )
+HBBITS=$(echo tiffinfo \"$pathToSequence$baseTifname\" )
 eval $HBBITS > tmpfile
 HBBITS=$(eval cat tmpfile | grep "Bits/Sample") | awk '{print $2}'
 
@@ -246,7 +261,3 @@ else
         eval "/usr/bin/ffmpeg -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'make sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit or 1280*720 8bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
 
 fi
-
-
-
-
