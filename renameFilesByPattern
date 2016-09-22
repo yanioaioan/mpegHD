@@ -9,8 +9,24 @@
 #date modified   :21/09/2016
 #==============================================================================
 
-#for f in *myframe*; do mv $f ${f/myframe/myframe_}; done
-#basic usage: ./renameScript filestomatch matchexpression replaceexpression"
+#How to use the renameFilesByPattern script:
+#
+#1)open bash profile: geany ~/.bashrc
+#2)append this line to the end: export PATH=$PATH:/public/bin/mpegScripts​
+#3)Save and Close bash
+#4)Source bash: source ~/.bashrc
+#
+#
+#ex. to find and rename files containing 'myframe' and change the 'myfr' part to 'my_fr'
+#we would type: 
+
+#renameFilesByPattern myframe myfr my_fr​
+#
+#-1st argument myframe: common part of the name of the files we are trying to rename
+#-2nd argument myf: part of file to be replaced by the 3rd argument
+#-3rd argument my_f: part of file to replace the 2nd argument
+
+#ex.  myframe.0001.tiff would become my_frame.0001.tiff
 
 
 if [ $# -ne 3 ]; then

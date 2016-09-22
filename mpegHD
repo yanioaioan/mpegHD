@@ -4,9 +4,23 @@
 #author		     :Ioannis Ioannidis
 #date            :4/12/2015
 #version         :2  
-#usage		     :./mpegHD pathToSequenceOfTiffs out.mp4,  example format myframe_0001.tiff
+#usage		     :./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
 #date modified   :21/09/2016  
 #==============================================================================
+
+
+#How to use the mpegHD script:
+#
+#1)open bash profile: geany ~/.bashrc
+#2)append this line to the end: export PATH=$PATH:/public/bin/mpegScripts​
+#3)Save and Close bash
+#4)Source bash: source ~/.bashrc
+#
+#5) export a sequence of 8bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
+#6) cd to this directory : `cd frameSequenceDir`
+#7)run the following command:  `mpegHD ./ outVideo.mp4`
+
+
 
 
 pathToSequence=$1
