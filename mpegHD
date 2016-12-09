@@ -1,11 +1,11 @@
 #! /usr/bin/bash
 #title           :mpegHD
 #description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames.
-#author		     :Ioannis Ioannidis
+#author		 :Ioannis Ioannidis
 #date            :4/12/2015
 #version         :2  
-#usage		     :./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
-#date modified   :21/09/2016  
+#usage           :./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+#date modified   :09/11/2016
 #==============================================================================
 
 
@@ -20,14 +20,35 @@
 #6) cd to this directory : `cd frameSequenceDir`
 #7)run the following command:  `mpegHD ./ outVideo.mp4`
 
+#NOTE THAT ONLY 16 bit images will be processed by default unless EXPLICITLY SPECIFIED using the '-8' bit flag as in: mpegHD -8 ./ outVideo.mp4
 
 
 
-pathToSequence=$1
-outputVideoFile=$2
+
+procees_8_BIT_images=0
+
+while getopts "8" OPTION
+do
+    case $OPTION in
+        8)
+        echo "8 bit images are going to be processed"
+        procees_8_BIT_images=1
+        break
+        ;;
+    esac
+done
 
 
-#The following handles the fact the we may have all frame sequence directory formats, for example: #. OR ./ OR pathToSequenceDir/
+echo $procees_8_BIT_images
+
+
+
+
+pathToSequence=$2
+outputVideoFile=$3
+
+
+#The following handles the fact the we may have all frame sequence directory formats, for example: . OR ./ OR pathToSequenceDir/
 #check if the dir of the frame sequence given is simply .
 #if yes, then append the / to it so it finally becomes ./
 if [ "$pathToSequence" == "." ];then
@@ -95,7 +116,7 @@ HBWIDTH=$(echo $HBINFO | awk '{print $3}')
 HBHEIGHT=$(echo $HBINFO | awk '{print $6}')
 HBBITS=$(echo tiffinfo \"$pathToSequence$baseTifname\" )
 eval $HBBITS > tmpfile
-HBBITS=$(eval cat tmpfile | grep "Bits/Sample") | awk '{print $2}'
+HBBITS=$(eval cat tmpfile | grep "Bits/Sample") | awk '{print $3}'
 
 eval rm -rf tmpfile
 
@@ -106,9 +127,11 @@ echo "HBBITS="$HBBITS
 
 #if  [[ ( $a -ne 0 &&  $a -ne 1  )  ||  ( $b -ne 2  &&  $b -ne 3 )  || ( $c -ne 4 ) ]]   ; then
 
-if [[ ( $HBWIDTH -ne 1280  &&  $HBWIDTH -ne 1920 ) || ( $HBHEIGHT -ne 720  &&  $HBHEIGHT -ne 1080 ) || ( $HBBITS -ne 8 ) ]] ; then
+#if the resolution is not SD OR if the resolution is not HD OR if we have NOT 16 bit images and the flag 'procees_8_BIT_images' NOT set to 1
+if [[ ( $HBWIDTH -ne 1280  &&  $HBWIDTH -ne 1920 ) || ( $HBHEIGHT -ne 720  &&  $HBHEIGHT -ne 1080 ) || ( $HBBITS -ne 16 && procees_8_BIT_images -ne 1) ]] ; then
         echo $'\nMake sure your using the following command format: \n\n	Basic script usage: ./mpegScript.sh pathToSequenceOfTiffs out.mp4\nOR\n'
-        echo "wrong image format: needs to be either 1920x1080 8 bit or 1280x720 8bit"
+        #echo "wrong image format: needs to be either 1920x1080 8 bit or 1280x720 8bit"
+        echo "wrong image format: needs to be either 1920x1080 16 bit or 1280x720 16bit OR the even 8bit ones but in this case you need to specify the 8 flag as in \" mpegHD -8 ./ outVideo.mp4\""
         echo "you need to make sure you have exporter the frame sequence based on the previous specs"
         exit
 fi
