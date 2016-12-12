@@ -1,11 +1,24 @@
 #! /usr/bin/bash
 #title           :mpegHD
-#description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames.
+#description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames (supports ffmpeg version 2.7.2 ).
+#ffmpeg --v
+#ffmpeg version 2.7.2 Copyright (c) 2000-2015 the FFmpeg developers
+#  built with gcc 4.8.3 (GCC) 20140911 (Red Hat 4.8.3-9)
+#  configuration:
+#  libavutil      54. 27.100 / 54. 27.100
+#  libavcodec     56. 41.100 / 56. 41.100
+#  libavformat    56. 36.100 / 56. 36.100
+#  libavdevice    56.  4.100 / 56.  4.100
+#  libavfilter     5. 16.101 /  5. 16.101
+#  libswscale      3.  1.101 /  3.  1.101
+#  libswresample   1.  2.100 /  1.  2.100
+#
 #author		 :Ioannis Ioannidis
 #date            :4/12/2015
-#version         :2  
-#usage           :./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
-#date modified   :09/11/2016
+#version         :2.1
+#usage           : cd pathToSequenceOfTiffs
+#                : ./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+#date modified   :12/12/2016
 #==============================================================================
 
 
@@ -16,13 +29,56 @@
 #3)Save and Close bash
 #4)Source bash: source ~/.bashrc
 #
-#5) export a sequence of 8bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
-#6) cd to this directory : `cd frameSequenceDir`
+#5)export a sequence of 8bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
+#6)cd to this directory : `cd frameSequenceDir`
 #7)run the following command:  `mpegHD ./ outVideo.mp4`
 
-#NOTE THAT ONLY 16 bit images will be processed by default unless EXPLICITLY SPECIFIED using the '-8' bit flag as in: mpegHD -8 ./ outVideo.mp4
+#NOTE THAT ONLY 16 bit images will be processed by default unless EXPLICITLY SPECIFIED for 8 bit images using the '-8' bit flag --> mpegHD -8 ./ outVideo.mp4
 
 
+if [ $# -eq 0 ];then
+
+#print multiline help card
+cat << EOF
+
+            title           :mpegHD
+            description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames (supports ffmpeg version 2.7.2 ).
+
+            #ffmpeg --v
+            #ffmpeg version 2.7.2 Copyright (c) 2000-2015 the FFmpeg developers
+            #  built with gcc 4.8.3 (GCC) 20140911 (Red Hat 4.8.3-9)
+            #  configuration:
+            #  libavutil      54. 27.100 / 54. 27.100
+            #  libavcodec     56. 41.100 / 56. 41.100
+            #  libavformat    56. 36.100 / 56. 36.100
+            #  libavdevice    56.  4.100 / 56.  4.100
+            #  libavfilter     5. 16.101 /  5. 16.101
+            #  libswscale      3.  1.101 /  3.  1.101
+            #  libswresample   1.  2.100 /  1.  2.100
+            #
+
+            author          :Ioannis Ioannidis
+            date            :4/12/2015
+            version         :2.1
+            usage           : cd pathToSequenceOfTiffs
+                            : ./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+            date modified   :12/12/2016
+            ==============================================================================
+            How to use the mpegHD script:
+            1)open bash profile: geany ~/.bashrc
+            2)append this line to the end: export PATH=\$PATH:/public/bin/mpegScripts​
+            3)Save and Close bash
+            4)Source bash: source ~/.bashrc
+            5)export a sequence of 8bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
+            6)cd to this directory : cd frameSequenceDir
+            7)run the following command:  mpegHD ./ outVideo.mp4
+
+            NOTE THAT ONLY 16 bit images will be processed by default unless EXPLICITLY SPECIFIED for 8 bit images using the '-8' bit flag --> mpegHD -8 ./ outVideo.mp4
+
+EOF
+
+    exit 1
+fi
 
 
 procees_8_BIT_images=0
@@ -129,11 +185,11 @@ echo "HBBITS="$HBBITS
 
 #if the resolution is not SD OR if the resolution is not HD OR if we have NOT 16 bit images and the flag 'procees_8_BIT_images' NOT set to 1
 if [[ ( $HBWIDTH -ne 1280  &&  $HBWIDTH -ne 1920 ) || ( $HBHEIGHT -ne 720  &&  $HBHEIGHT -ne 1080 ) || ( $HBBITS -ne 16 && procees_8_BIT_images -ne 1) ]] ; then
-        echo $'\nMake sure your using the following command format: \n\n	Basic script usage: ./mpegScript.sh pathToSequenceOfTiffs out.mp4\nOR\n'
+        echo $'\nMake sure your using the following command format: \n\n	Basic script usage: \n\n\t  1)cd pathToSequenceOfTiffs\n\t  2)./mpegScript.sh pathToSequenceOfTiffs out.mp4\n    OR\n'
         #echo "wrong image format: needs to be either 1920x1080 8 bit or 1280x720 8bit"
         echo "wrong image format: needs to be either 1920x1080 16 bit or 1280x720 16bit OR the even 8bit ones but in this case you need to specify the 8 flag as in \" mpegHD -8 ./ outVideo.mp4\""
-        echo "you need to make sure you have exporter the frame sequence based on the previous specs"
-        exit
+        echo $'you need to make sure you have exporter the frame sequence based on the previous specs\n\n'
+        exit 1
 fi
 
 
@@ -260,7 +316,7 @@ if echo ${myarray[-2]} | grep "[a-zA-Z]";then
         baseTifname=${basename:0:$baseLeft-1}
         echo "now baseTifname..:" $baseTifname
 
-        eval "/usr/bin/ffmpeg -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'make sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit or 1280*720 8bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+        eval "/usr/bin/ffmpeg -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy -vf format=yuv420p​ 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'make sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
 
 else
 
