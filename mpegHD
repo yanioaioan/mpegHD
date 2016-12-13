@@ -17,7 +17,7 @@
 #date            :4/12/2015
 #version         :2.2
 #usage           : cd pathToSequenceOfTiffs
-#                : ./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+#                : mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
 #date modified   :12/12/2016
 #==============================================================================
 
@@ -104,7 +104,7 @@ cat << EOF
             date            :4/12/2015
             version         :2.1
             usage           : cd pathToSequenceOfTiffs
-                            : ./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+                            : mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
             date modified   :12/12/2016
             ==============================================================================
             How to use the mpegHD script:
@@ -229,7 +229,7 @@ echo "HBBITS="$HBBITS
 
 #if the resolution is not SD OR if the resolution is not HD OR if we have NOT 16 bit images and the flag 'procees_8_BIT_images' NOT set to 1
 if [[ ( $HBWIDTH -ne 1280  &&  $HBWIDTH -ne 1920 ) || ( $HBHEIGHT -ne 720  &&  $HBHEIGHT -ne 1080 ) || ( $HBBITS -ne 16 && procees_8_BIT_images -ne 1) ]] ; then
-        echo $'\nMake sure your using the following command format: \n\n	Basic script usage: \n\n\t  1)cd pathToSequenceOfTiffs\n\t  2)./mpegScript.sh pathToSequenceOfTiffs out.mp4\n    OR\n'
+        echo $'\nMake sure your using the following command format: \n\n	Basic script usage: \n\n\t  1)cd pathToSequenceOfTiffs\n\t  2)mpegHD pathToSequenceOfTiffs out.mp4\n    OR\n'
         #echo "wrong image format: needs to be either 1920x1080 8 bit or 1280x720 8bit"
         echo "wrong image format: needs to be either 1920x1080 16 bit or 1280x720 16bit OR the even 8bit ones but in this case you need to specify the 8 flag as in \" mpegHD -8 ./ outVideo.mp4\""
         echo $'you need to make sure you have exported the frame sequence based on the previous specs\n\n'
@@ -365,7 +365,7 @@ if echo ${myarray[-2]} | grep "[a-zA-Z]";then
 cat << EOF
 Script usage:
         1) cd pathToSequenceOfTiffs
-        2) ./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+        2) mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
 EOF
         
 else
@@ -406,7 +406,7 @@ else
 cat << EOF
 Script usage:
         1) cd pathToSequenceOfTiffs
-        2) ./mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+        2) mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
 EOF
 
 fi
