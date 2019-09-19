@@ -1,8 +1,8 @@
 #! /usr/bin/bash
 #title           :mpegHD
-#description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames (supports ffmpeg version 2.7.2 ).
+#description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames (supports ffmpeg version 2.8.15 ).
 #ffmpeg --v
-#ffmpeg version 2.7.2 Copyright (c) 2000-2015 the FFmpeg developers
+#ffmpeg version 2.8.15 Copyright (c) 2000-2015 the FFmpeg developers
 #  built with gcc 4.8.3 (GCC) 20140911 (Red Hat 4.8.3-9)
 #  configuration:
 #  libavutil      54. 27.100 / 54. 27.100
@@ -17,7 +17,7 @@
 #date            :4/12/2015
 #version         :2.2
 #usage           : cd pathToSequenceOfTiffs
-#                : mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+#                : /public/bin/mpegScripts/mpegHD ./ out.mp4,  example frame format myframe_0001.tiff
 #date modified   :19/0.5/2017
 #==============================================================================
 
@@ -29,7 +29,7 @@
 #3)Save and Close bash
 #4)Source bash: source ~/.bashrc
 #
-#5)export a sequence of 8bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
+#5)export a sequence of 8bit or 16bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
 #6)cd to this directory : `cd frameSequenceDir`
 #7)run the following command:  `mpegHD ./ outVideo.mp4`
 
@@ -39,7 +39,7 @@
 
 NEEDSUPDATE=0
 
-#CHECK if systen ffmpeg version is 2.7.2
+#CHECK if systen ffmpeg version is 2.8.15
 versionGrepCmd=$(echo ffmpeg "-version")
 ffmpeg_Version_greped=$(eval echo $versionGrepCmd)
 ffmpegVersionLine=$(eval $ffmpeg_Version_greped | grep "version")
@@ -47,13 +47,13 @@ ffmpegVersionLine=$(eval $ffmpeg_Version_greped | grep "version")
 IFS=' ' read -a myarray <<< "$ffmpegVersionLine"
 #assing and count characters
 version="${myarray[2]}"
-print version
+#print version
         echo "current system ffmpeg version is "$version
-	if [ $version == "N-86712-g1fe40e7" ];then
-	    echo $'N-86712-g1fe40e7 is the correct supported ffmpeg version'
+    if [ $version == "2.8.15" ];then
+        echo $'2.8.15 is the correct supported ffmpeg version'
 	else
-	    echo $'System ffmpeg version DOES NOT MATCH the one supported by the script (N-86712-g1fe40e7) \n(script possibly needs attention/update)'
-	    NEEDSUPDATE=1
+        echo $'System ffmpeg version DOES NOT MATCH the one supported by the script (2.8.15) \n(script possibly needs attention/update)'
+        NEEDSUPDATE=1
 	fi
 
 
@@ -86,42 +86,47 @@ if [ $# -eq 0 ];then
 cat << EOF
 
             title           :mpegHD
-	    description     :This script is just a temporary workaround for ffmpeg .mp4 conversion of a sequence of frames (supports ffmpeg version 2.7.2 ).
+        description     :This script is an ffmpeg based video exporter. Converting of a sequence of 8 or 16bit tiff frames to an SD or HD .mp4 (supports ffmpeg version 2.8.15 ).
+
 
             #ffmpeg --v
-	    #ffmpeg version 2.7.2 Copyright (c) 2000-2015 the FFmpeg developers
-	    #  built with gcc 4.8.3 (GCC) 20140911 (Red Hat 4.8.3-9)
-	    #  configuration:
-	    #  libavutil      54. 27.100 / 54. 27.100
-	    #  libavcodec     56. 41.100 / 56. 41.100
-	    #  libavformat    56. 36.100 / 56. 36.100
-	    #  libavdevice    56.  4.100 / 56.  4.100
-	    #  libavfilter     5. 16.101 /  5. 16.101
-	    #  libswscale      3.  1.101 /  3.  1.101
-	    #  libswresample   1.  2.100 /  1.  2.100
-	    #
+            #ffmpeg version 2.8.15 Copyright (c) 2000-2018 the FFmpeg developers
+              #built with gcc 4.8.5 (GCC) 20150623 (Red Hat 4.8.5-28)
+              #configuration: --prefix=/usr --bindir=/usr/bin --datadir=/usr/share/ffmpeg --incdir=/usr/include/ffmpeg --libdir=/usr/lib64 --mandir=/usr/share/man --arch=x86_64 --optflags='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic' --extra-ldflags='-Wl,-z,relro ' --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-version3 --enable-bzlib --disable-crystalhd --enable-gnutls --enable-ladspa --enable-libass --enable-libcdio --enable-libdc1394 --disable-indev=jack --enable-libfreetype --enable-libgsm --enable-libmp3lame --enable-openal --enable-libopenjpeg --enable-libopus --enable-libpulse --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libv4l2 --enable-libx264 --enable-libx265 --enable-libxvid --enable-x11grab --enable-avfilter --enable-avresample --enable-postproc --enable-pthreads --disable-static --enable-shared --enable-gpl --disable-debug --disable-stripping --shlibdir=/usr/lib64 --enable-runtime-cpudetect
+              #libavutil      54. 31.100 / 54. 31.100
+              #libavcodec     56. 60.100 / 56. 60.100
+              #libavformat    56. 40.101 / 56. 40.101
+              #libavdevice    56.  4.100 / 56.  4.100
+              #libavfilter     5. 40.101 /  5. 40.101
+              #libavresample   2.  1.  0 /  2.  1.  0
+              #libswscale      3.  1.101 /  3.  1.101
+              #libswresample   1.  2.101 /  1.  2.101
+              #libpostproc    53.  3.100 / 53.  3.100
+
+
 
             author          :Ioannis Ioannidis
-	    date            :4/12/2015
+            creation date   :4/12/2015
 	    version         :2.1
 	    usage           : cd pathToSequenceOfTiffs
-	                    : mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
-			date modified   :12/12/2016
+                        : /public/bin/mpegScripts/mpegHD ./ out.mp4,
+                                (example frame format myframe_0001.tiff)
+            date modified   :19/09/2019
 			==============================================================================
 			How to use the mpegHD script:
 			1)open bash profile: geany ~/.bashrc
 			2)append this line to the end: export PATH=\$PATH:/public/bin/mpegScripts​
 			3)Save and Close bash
 			4)Source bash: source ~/.bashrc
-			5)export a sequence of 8bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
+            5)export a sequence of 8bit or 16bit tiff frames (resolution either 1920x1080 or 1280x720) in a directory named 'ex. frameSequenceDir'
 			6)cd to this directory : cd frameSequenceDir
-			7)run the following command:  mpegHD ./ outVideo.mp4
+			7)run the following command:  /public/bin/mpegScripts/mpegHD ./ outVideo.mp4
 
-            NOTE THAT ONLY 16 bit images will be processed by default unless EXPLICITLY SPECIFIED for 8 bit images using the '-8' bit flag --> mpegHD -8 ./ outVideo.mp4
+            NOTE THAT ONLY 16 bit images will be processed by default unless EXPLICITLY SPECIFIED for 8 bit images using the '-8' bit flag --> /public/bin/mpegScripts/mpegHD -8 ./ outVideo.mp4
 
 EOF
 
-
+exit
 fi
 
 
@@ -142,6 +147,7 @@ done
 
 echo $procees_8_BIT_images
 
+
 #there's a difference in the number of cmd arguments given to the script, depending on whether we want to process 8 or 16 bit tiff frames
 #Hence..pathToSequence & outputVideoFile variables need to be assigned values from different arguments accordingly
 if [ $procees_8_BIT_images == 1 ];then
@@ -153,6 +159,9 @@ if [ $procees_8_BIT_images == 1 ];then
 
     pathToSequence=$2
     outputVideoFile=$3
+
+    echo "pathToSequence =" $pathToSequence
+    echo "outputVideoFile =" $outputVideoFile
 else
     echo "Since..16 bit images are going to be processed"
     echo "argument $1==" $1
@@ -160,6 +169,9 @@ else
 
     pathToSequence=$1
     outputVideoFile=$2
+
+    echo "pathToSequence =" $pathToSequence
+    echo "outputVideoFile =" $outputVideoFile
 fi
 
 
@@ -244,31 +256,37 @@ echo "sample file: "$pathToSequence$baseTifname
 echo "$pathToSequence$baseTifname"
 
 #Grab and check frame format
-HBINFO=$(echo tiffinfo \"$pathToSequence$baseTifname\" )
-eval $HBINFO > tmpfile
-HBINFO=$(eval cat tmpfile | grep "Image Width")
+#HBINFO=$(echo tiffinfo \"$pathToSequence$baseTifname\" )#WAS
+HBINFO=$(echo /opt/pixar/RenderManProServer-22.5/bin/tiffinfo \"$pathToSequence$baseTifname\" )
+
+eval $HBINFO > ~/tmpfile
+HBINFO=$(eval cat ~/tmpfile | grep "Image Width")
 
 
 HBWIDTH=$(echo $HBINFO | awk '{print $3}')
 HBHEIGHT=$(echo $HBINFO | awk '{print $6}')
-HBBITS=$(echo tiffinfo \"$pathToSequence$baseTifname\" )
-eval $HBBITS > tmpfile
-HBBITS=$(eval cat tmpfile | grep "Bits/Sample") | awk '{print $3}'
 
-eval rm -rf tmpfile
+#HBBITS=$(echo tiffinfo \"$pathToSequence$baseTifname\" )#WAS
+HBBITS=$(echo /opt/pixar/RenderManProServer-22.5/bin/tiffinfo \"$pathToSequence$baseTifname\" )
+
+eval $HBBITS > ~/tmpfile
+HBBITS=$(eval cat ~/tmpfile | grep "Bits/Sample" | awk '{print $2}')
+
 
 echo "HBINFO="$HBINFO
 echo "HBWIDTH="$HBWIDTH
 echo "HBHEIGHT="$HBHEIGHT
 echo "HBBITS="$HBBITS
 
+eval rm -rf ~/tmpfile
+
 #if  [[ ( $a -ne 0 &&  $a -ne 1  )  ||  ( $b -ne 2  &&  $b -ne 3 )  || ( $c -ne 4 ) ]]   ; then
 
 #if the resolution is not SD OR if the resolution is not HD OR if we have NOT 16 bit images and the flag 'procees_8_BIT_images' NOT set to 1
 if [[ ( $HBWIDTH -ne 1280  &&  $HBWIDTH -ne 1920 ) || ( $HBHEIGHT -ne 720  &&  $HBHEIGHT -ne 1080 ) || ( $HBBITS -ne 16 && procees_8_BIT_images -ne 1) ]] ; then
-        echo $'\nMake sure your using the following command format: \n\n	Basic script usage: \n\n\t  1)cd pathToSequenceOfTiffs\n\t  2)mpegHD pathToSequenceOfTiffs out.mp4\n    OR\n'
+        echo $'\nMake sure your using the following command format: \n\n	Basic script usage: \n\n\t  1)cd pathToSequenceOfTiffs\n\t  2)/public/bin/mpegScripts/mpegHD ./ out.mp4\n    OR\n'
 	#echo "wrong image format: needs to be either 1920x1080 8 bit or 1280x720 8bit"
-	echo "wrong image format: needs to be either 1920x1080 16 bit or 1280x720 16bit OR the even 8bit ones but in this case you need to specify the 8 flag as in \" mpegHD -8 ./ outVideo.mp4\""
+	echo "wrong image format: needs to be either 1920x1080 16 bit or 1280x720 16bit OR the even 8bit ones but in this case you need to specify the 8 flag as in \" /public/bin/mpegScripts/mpegHD -8 ./ outVideo.mp4\""
 	echo $'you need to make sure you have exported the frame sequence based on the previous specs\n\n'
 	exit 1
 fi
@@ -398,14 +416,24 @@ if echo ${myarray[-2]} | grep "[a-zA-Z]";then
 	baseTifname=${basename:0:$baseLeft-1}
 	echo "now baseTifname..:" $baseTifname
 
-        echo "8bit encoding...: /usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame} -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)\n'
+
 	#-pix_fmt could be yuv444p instead of yuv420p
-	eval "/usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame}  -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy  1 -pix_fmt yuv420p -g 250 -b:a 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+    if [ "$HBWIDTH" == "1920" ] && [ "$HBHEIGHT" == "1080" ]; then
+      echo " encoding...: /usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame} -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)\n'
+      eval "/usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame}  -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy  1 -pix_fmt yuv420p -g 250 -b:a 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+
+    elif [ $HBWIDTH == "1280" ] && [ $HBHEIGHT == "720" ]; then
+      echo " encoding...: /usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame} -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd720 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)\n'
+      eval "/usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame}  -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd720 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy  1 -pix_fmt yuv420p -g 250 -b:a 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+    fi
 
 cat << EOF
 Script usage:
-        1) cd pathToSequenceOfTiffs
-	2) mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+            1) cd pathToSequenceOfTiffs
+            2) /public/bin/mpegScripts/mpegHD ./ out.mp4,
+
+        (example frame format myframe_0001.tiff)
+
 EOF
 
 else
@@ -443,15 +471,23 @@ else
 
         paddingnumberofCharcters=${#padding}
 
-        echo "16bit encoding...: /usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame} -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)\n'
-	#-pix_fmt could be yuv444p instead of yuv420p
-	eval "/usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame} -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy  1 -pix_fmt yuv420p -g 250 -b:a 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+      if [ "$HBWIDTH" == "1920" ] && [ "$HBHEIGHT" == "1080" ]; then
+        echo " encoding...: /usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame} -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)\n'
+        eval "/usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame}  -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd1080 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy  1 -pix_fmt yuv420p -g 250 -b:a 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+
+      elif [ $HBWIDTH == "1280" ] && [ $HBHEIGHT == "720" ]; then
+        echo " encoding...: /usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame} -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd720 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy 1 -g 250 -b 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)\n'
+        eval "/usr/bin/ffmpeg -start_number ${start_at_arbitrary_frame}  -y -i \"$pathToSequence\${baseTifname}%0${paddingnumberofCharcters}d.${tiffExtension}\" -vcodec h264 -r 24000/1001 -s hd720 -me_method full -sc_threshold 40 -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -i_qfactor 0.71 -keyint_min 25 -b_strategy  1 -pix_fmt yuv420p -g 250 -b:a 6144k -bt 8192k -g 24 -r 25 -f mp4 \"$pathToSequence$outputVideoFile\"" || echo $'\n-------------------\t-------------------\t-------------------\t-------------------\n\nmake sure your frames are exported using either one the following naming formats:\n\n -framenamePADING.EXTENSION or framename_PADING.EXTENSION \n\nFor example myframe_0001.tiff.\nIf not, then rename the frame sequence and also make sure you stick to the following image formats\n\n-either 1920*1080 8bit/16bit or 1280*720 8bit/16bit tiff files\n\nand try running the script again\n(you can use the renameFilesByPattern script to rename your files)'
+      fi
 
 
 cat << EOF
 Script usage:
-        1) cd pathToSequenceOfTiffs
-	2) mpegHD pathToSequenceOfTiffs out.mp4,  example frame format myframe_0001.tiff
+            1) cd pathToSequenceOfTiffs
+            2) /public/bin/mpegScripts/mpegHD ./ out.mp4,
+
+        (example frame format myframe_0001.tiff)
+
 EOF
 
 fi
